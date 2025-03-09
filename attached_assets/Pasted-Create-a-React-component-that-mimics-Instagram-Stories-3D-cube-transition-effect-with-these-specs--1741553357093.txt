@@ -1,0 +1,126 @@
+Create a React component that mimics Instagram Stories' 3D cube transition effect with these specs:
+
+1. Instagram Stories-Style Features:
+- 3D cube rotation between stories (like Instagram's horizontal swipe)
+- Stories appear in a phone frame/viewport
+- Tap left/right zones for navigation (like Instagram)
+- Smooth 3D rotation on swipe/drag
+- Story progress indicator (current/total in bottom right)
+- Seamless infinite loop when reaching end/start
+
+2. Core Animation:
+- 3D cube effect using CSS transforms
+- Each face rotates 90deg on Y-axis
+- Perspective: 1200px for depth
+- Smooth transitions (0.5s ease)
+- Faces should be 375px wide (standard mobile width)
+- Backface visibility hidden to prevent see-through
+
+3. Touch Interactions (Like Instagram):
+- Swipe/drag to preview next/previous
+- Snap back if swipe < 50px
+- Advance if swipe > 50px
+- Tap zones on left/right edges
+- Lock during transitions
+- Support for:
+  - touchstart/touchmove/touchend
+  - mousedown/mousemove/mouseup
+  - Arrow keys
+
+4. Visual Structure:
+```tsx
+<div className="page-wrapper">
+  {/* Desktop Header */}
+  <div className="desktop-header">
+    {/* Logo */}
+  </div>
+
+  <div className="slider-container">
+    {/* Phone Frame */}
+    <div className="phone-frame">
+      {/* 3D Cube */}
+      <div className="cube-wrapper">
+        {/* Story Faces */}
+        <div className="cube-face">
+          {/* Story Content */}
+          {/* Story Number Indicator */}
+        </div>
+      </div>
+      
+      {/* Navigation Buttons */}
+      <button className="nav-button prev-button" />
+      <button className="nav-button next-button" />
+    </div>
+  </div>
+</div>
+```
+
+5. Responsive Behavior:
+- Mobile: Full viewport width
+- Desktop: Phone frame (375x667px) with shadow
+- Maintain aspect ratio
+- Center content in viewport
+
+6. State Management:
+```typescript
+const [currentIndex, setCurrentIndex] = useState(0);
+const [isDragging, setIsDragging] = useState(false);
+const [startX, setStartX] = useState(0);
+const [currentX, setCurrentX] = useState(0);
+const [isAnimating, setIsAnimating] = useState(false);
+const [totalRotations, setTotalRotations] = useState(0);
+```
+
+7. Core Functions:
+```typescript
+// Navigation
+const goToNext = () => {
+  // Handle rotation to next story
+  // Include infinite loop logic
+}
+
+const goToPrevious = () => {
+  // Handle rotation to previous story
+  // Include infinite loop logic
+}
+
+// Touch/Mouse Handlers
+const handleTouchStart = (e: TouchEvent | MouseEvent) => {
+  // Track start position
+}
+
+const handleTouchMove = (e: TouchEvent | MouseEvent) => {
+  // Calculate drag distance
+  // Update cube rotation preview
+}
+
+const handleTouchEnd = () => {
+  // Determine if should advance/return/snap back
+}
+```
+
+8. CSS Requirements:
+```css
+/* Core 3D transforms */
+.cube-wrapper {
+  transform-style: preserve-3d;
+  transform: translateZ(-${CUBE_TRANSLATE_Z}px) rotateY(${rotation}deg);
+  transition: transform 0.5s ease;
+}
+
+/* Face positioning */
+.cube-face {
+  position: absolute;
+  backface-visibility: hidden;
+  transform: rotateY(${index * 90}deg) translateZ(${CUBE_WIDTH / 2}px);
+}
+```
+
+9. Performance Optimizations:
+- Use transform3d for GPU acceleration
+- Debounce window resize handlers
+- Cleanup event listeners
+- Lock during animations
+- Prevent unnecessary rerenders
+
+The component should feel exactly like Instagram Stories' horizontal navigation, with the same smooth 3D cube rotation effect, touch responsiveness, and visual polish.
