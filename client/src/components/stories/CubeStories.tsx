@@ -69,7 +69,7 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
                   transform: `rotateY(${index * 90}deg) translateZ(${CUBE_SIZE / 2}px)`,
                 }}
               >
-                <div className="w-full h-full overflow-y-auto p-4"> {/* Added padding for better layout */}
+                <div className="w-full h-full">
                   {story.content}
                 </div>
               </div>
