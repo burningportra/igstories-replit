@@ -36,9 +36,6 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     container.focus();
   }, []);
 
-  // Calculate degrees per story
-  const degreesPerStory = 360 / stories.length;
-
   return (
     <PhoneFrame>
       <div
@@ -69,7 +66,7 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
                 key={story.id}
                 className="cube-face absolute w-full h-full backface-hidden bg-white"
                 style={{
-                  transform: `rotateY(${index * degreesPerStory}deg) translateZ(${CUBE_SIZE / 2}px)`,
+                  transform: `rotateY(${index * 90}deg) translateZ(${CUBE_SIZE / 2}px)`,
                 }}
               >
                 <div className="w-full h-full">

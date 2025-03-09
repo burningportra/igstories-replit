@@ -6,9 +6,6 @@ interface TouchState {
 }
 
 export default function useStoryNavigation(totalStories: number) {
-  // Calculate degrees per story dynamically
-  const ROTATION_MULTIPLIER = -(360 / totalStories); // Negative for correct rotation direction
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [rotation, setRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -27,8 +24,8 @@ export default function useStoryNavigation(totalStories: number) {
   );
 
   const updateRotation = useCallback((index: number) => {
-    setRotation(index * ROTATION_MULTIPLIER);
-  }, [ROTATION_MULTIPLIER]);
+    setRotation(index * -90); // Always rotate by 90 degrees
+  }, []);
 
   const goToNext = useCallback(() => {
     setCurrentIndex((prev) => {
@@ -75,14 +72,13 @@ export default function useStoryNavigation(totalStories: number) {
       }));
 
       const deltaX = clientX - touchState.startX;
-      // Adjust sensitivity based on number of stories
-      const rotationDelta = (deltaX / window.innerWidth) * (360 / totalStories / 2);
+      const rotationDelta = (deltaX / window.innerWidth) * 45; // Fixed sensitivity
       setRotation((prev) => {
-        const baseRotation = currentIndex * ROTATION_MULTIPLIER;
+        const baseRotation = currentIndex * -90;
         return baseRotation + rotationDelta;
       });
     },
-    [isDragging, touchState.startX, currentIndex, ROTATION_MULTIPLIER, totalStories]
+    [isDragging, touchState.startX, currentIndex]
   );
 
   const handleTouchEnd = useCallback(() => {
