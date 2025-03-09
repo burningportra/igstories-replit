@@ -6,8 +6,7 @@ import StoryIndicator from "./StoryIndicator";
 
 interface Story {
   id: number;
-  imageUrl: string;
-  alt: string;
+  content: React.ReactNode;
 }
 
 interface CubeStoriesProps {
@@ -65,17 +64,14 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
             {stories.map((story, index) => (
               <div
                 key={story.id}
-                className="cube-face absolute w-full h-full backface-hidden"
+                className="cube-face absolute w-full h-full backface-hidden bg-white"
                 style={{
                   transform: `rotateY(${index * 90}deg) translateZ(${CUBE_SIZE / 2}px)`,
                 }}
               >
-                <img
-                  src={story.imageUrl}
-                  alt={story.alt}
-                  className="w-full h-full object-cover"
-                  draggable={false}
-                />
+                <div className="w-full h-full overflow-y-auto p-4"> {/* Added padding for better layout */}
+                  {story.content}
+                </div>
               </div>
             ))}
           </motion.div>
