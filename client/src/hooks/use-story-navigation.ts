@@ -5,9 +5,10 @@ interface TouchState {
   currentX: number;
 }
 
-const ROTATION_MULTIPLIER = -51.43; // 360/7 degrees for 7 slides
-
 export default function useStoryNavigation(totalStories: number) {
+  // Calculate degrees per story dynamically
+  const ROTATION_MULTIPLIER = -(360 / totalStories); // Negative for correct rotation direction
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [rotation, setRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -27,7 +28,7 @@ export default function useStoryNavigation(totalStories: number) {
 
   const updateRotation = useCallback((index: number) => {
     setRotation(index * ROTATION_MULTIPLIER);
-  }, []);
+  }, [ROTATION_MULTIPLIER]);
 
   const goToNext = useCallback(() => {
     setCurrentIndex((prev) => {
@@ -74,13 +75,14 @@ export default function useStoryNavigation(totalStories: number) {
       }));
 
       const deltaX = clientX - touchState.startX;
-      const rotationDelta = (deltaX / window.innerWidth) * 25; // Reduced sensitivity for more slides
+      // Adjust sensitivity based on number of stories
+      const rotationDelta = (deltaX / window.innerWidth) * (360 / totalStories / 2);
       setRotation((prev) => {
         const baseRotation = currentIndex * ROTATION_MULTIPLIER;
         return baseRotation + rotationDelta;
       });
     },
-    [isDragging, touchState.startX, currentIndex]
+    [isDragging, touchState.startX, currentIndex, ROTATION_MULTIPLIER, totalStories]
   );
 
   const handleTouchEnd = useCallback(() => {
