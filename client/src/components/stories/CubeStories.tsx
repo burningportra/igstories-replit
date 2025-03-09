@@ -14,9 +14,9 @@ interface CubeStoriesProps {
   stories: Story[];
 }
 
-export default function CubeStories({ stories }: CubeStoriesProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+const CUBE_SIZE = 375; // Width of the cube face
 
+export default function CubeStories({ stories }: CubeStoriesProps) {
   const {
     currentIndex,
     rotation,
@@ -29,10 +29,11 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     goToPrevious,
   } = useStoryNavigation(stories.length);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-
     container.focus();
   }, []);
 
@@ -57,8 +58,8 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
           <motion.div
             className="cube-wrapper absolute w-full h-full transform-style-3d"
             style={{
-              transform: `translateZ(-375px) rotateY(${rotation}deg)`,
-              transition: isDragging ? "none" : "transform 0.5s ease",
+              transform: `translateZ(-${CUBE_SIZE / 2}px) rotateY(${rotation}deg)`,
+              transition: isDragging ? undefined : "transform 500ms cubic-bezier(0.4, 0.0, 0.2, 1)",
             }}
           >
             {stories.map((story, index) => (
@@ -66,13 +67,14 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
                 key={story.id}
                 className="cube-face absolute w-full h-full backface-hidden"
                 style={{
-                  transform: `rotateY(${index * 90}deg) translateZ(375px)`,
+                  transform: `rotateY(${index * 90}deg) translateZ(${CUBE_SIZE / 2}px)`,
                 }}
               >
                 <img
                   src={story.imageUrl}
                   alt={story.alt}
                   className="w-full h-full object-cover"
+                  draggable={false}
                 />
               </div>
             ))}
