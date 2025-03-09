@@ -5,7 +5,7 @@ interface TouchState {
   currentX: number;
 }
 
-const ROTATION_MULTIPLIER = -90; // Negative for correct rotation direction
+const ROTATION_MULTIPLIER = -51.43; // 360/7 degrees for 7 slides
 
 export default function useStoryNavigation(totalStories: number) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -74,7 +74,7 @@ export default function useStoryNavigation(totalStories: number) {
       }));
 
       const deltaX = clientX - touchState.startX;
-      const rotationDelta = (deltaX / window.innerWidth) * 45; // Reduced sensitivity
+      const rotationDelta = (deltaX / window.innerWidth) * 25; // Reduced sensitivity for more slides
       setRotation((prev) => {
         const baseRotation = currentIndex * ROTATION_MULTIPLIER;
         return baseRotation + rotationDelta;
