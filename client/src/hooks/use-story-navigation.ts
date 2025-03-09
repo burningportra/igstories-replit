@@ -5,6 +5,8 @@ interface TouchState {
   currentX: number;
 }
 
+const ROTATION_MULTIPLIER = -90; // Negative for correct rotation direction
+
 export default function useStoryNavigation(totalStories: number) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [rotation, setRotation] = useState(0);
@@ -23,18 +25,30 @@ export default function useStoryNavigation(totalStories: number) {
     [totalStories]
   );
 
+  const updateRotation = useCallback((index: number) => {
+    setRotation(index * ROTATION_MULTIPLIER);
+  }, []);
+
   const goToNext = useCallback(() => {
-    setCurrentIndex((prev) => normalizeIndex(prev + 1));
-    setRotation((prev) => prev - 90);
-  }, [normalizeIndex]);
+    setCurrentIndex((prev) => {
+      const nextIndex = normalizeIndex(prev + 1);
+      updateRotation(nextIndex);
+      return nextIndex;
+    });
+  }, [normalizeIndex, updateRotation]);
 
   const goToPrevious = useCallback(() => {
-    setCurrentIndex((prev) => normalizeIndex(prev - 1));
-    setRotation((prev) => prev + 90);
-  }, [normalizeIndex]);
+    setCurrentIndex((prev) => {
+      const nextIndex = normalizeIndex(prev - 1);
+      updateRotation(nextIndex);
+      return nextIndex;
+    });
+  }, [normalizeIndex, updateRotation]);
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent | React.MouseEvent) => {
+      if (isDragging) return;
+
       const clientX =
         "touches" in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
 
@@ -44,7 +58,7 @@ export default function useStoryNavigation(totalStories: number) {
         currentX: clientX,
       });
     },
-    []
+    [isDragging]
   );
 
   const handleTouchMove = useCallback(
@@ -60,10 +74,13 @@ export default function useStoryNavigation(totalStories: number) {
       }));
 
       const deltaX = clientX - touchState.startX;
-      const rotationDelta = (deltaX / window.innerWidth) * 90;
-      setRotation((prev) => prev + rotationDelta);
+      const rotationDelta = (deltaX / window.innerWidth) * 45; // Reduced sensitivity
+      setRotation((prev) => {
+        const baseRotation = currentIndex * ROTATION_MULTIPLIER;
+        return baseRotation + rotationDelta;
+      });
     },
-    [isDragging, touchState.startX]
+    [isDragging, touchState.startX, currentIndex]
   );
 
   const handleTouchEnd = useCallback(() => {
@@ -79,18 +96,21 @@ export default function useStoryNavigation(totalStories: number) {
         goToNext();
       }
     } else {
-      setRotation((prev) => Math.round(prev / 90) * 90);
+      updateRotation(currentIndex);
     }
 
     setIsDragging(false);
-  }, [isDragging, touchState, goToNext, goToPrevious]);
+  }, [isDragging, touchState, goToNext, goToPrevious, currentIndex, updateRotation]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        goToPrevious();
-      } else if (e.key === "ArrowRight") {
-        goToNext();
+      switch (e.key) {
+        case "ArrowLeft":
+          goToPrevious();
+          break;
+        case "ArrowRight":
+          goToNext();
+          break;
       }
     },
     [goToNext, goToPrevious]
@@ -99,13 +119,14 @@ export default function useStoryNavigation(totalStories: number) {
   useEffect(() => {
     const cleanup = () => {
       setIsDragging(false);
+      updateRotation(currentIndex);
     };
 
     window.addEventListener("blur", cleanup);
     return () => {
       window.removeEventListener("blur", cleanup);
     };
-  }, []);
+  }, [currentIndex, updateRotation]);
 
   return {
     currentIndex,
