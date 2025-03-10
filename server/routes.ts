@@ -14,22 +14,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Log available methods for debugging
       console.log('Available object storage methods:', Object.keys(objectStorage));
 
+      // Get the bucket state
+      const state = objectStorage.state;
+      console.log('Bucket state:', state);
+
       // Prefix the key with 'images/'
       const key = `images/${req.params.key}`;
       console.log(`Attempting to access key: ${key}`);
 
-      // Try to get the object directly
-      const object = await objectStorage.get(key);
-      if (!object) {
-        throw new Error(`Object not found: ${key}`);
+      // List files to check what's available
+      const files = await objectStorage.list();
+      console.log('Available files:', files);
+
+      // Try to get the file directly using state
+      const file = state.files.find(f => f.key === key);
+      if (!file) {
+        throw new Error(`File not found: ${key}`);
       }
 
-      // Get the raw data
-      const buffer = await object.arrayBuffer();
-      const contentType = object.type || 'image/svg+xml';
+      // Get the file data
+      const response = await fetch(file.url);
+      const buffer = await response.arrayBuffer();
 
-      // Send the image directly
-      res.setHeader('Content-Type', contentType);
+      // Send the file with appropriate headers
+      res.setHeader('Content-Type', file.type || 'image/svg+xml');
       res.setHeader('Cache-Control', 'public, max-age=3600');
       res.send(Buffer.from(buffer));
     } catch (error) {
