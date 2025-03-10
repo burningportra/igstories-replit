@@ -43,14 +43,14 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     if (!hasInteracted) {
       const animateHint = async () => {
         // Move towards next slide
-        setHintRotation(-70);
+        setHintRotation(-35);
         // Return to original position after a delay
         setTimeout(() => {
           setHintRotation(0);
         }, 800);
       };
 
-      const intervalId = setInterval(animateHint, 2000); // Repeat every 2 seconds
+      const intervalId = setInterval(animateHint, 3000); // Repeat every 3 seconds
 
       return () => clearInterval(intervalId);
     }
