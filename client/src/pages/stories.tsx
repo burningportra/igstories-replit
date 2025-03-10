@@ -1,10 +1,20 @@
 import { useEffect, useState } from 'react';
 import CubeStories from "@/components/stories/CubeStories";
 
-const stories = [
+interface ImageUrls {
+  hanuman: string;
+  wordmark: string;
+}
+
+interface Story {
+  id: number;
+  content: React.ReactNode | ((props: { imageUrls: ImageUrls }) => React.ReactNode);
+}
+
+const stories: Story[] = [
   {
     id: 1,
-    content: ({imageUrl}: {imageUrl: string}) => (
+    content: ({imageUrls}: {imageUrls: ImageUrls}) => (
       <div className="h-full flex flex-col">
         {/* Marquee section with pull quotes */}
         <div className="bg-[#EE5524] pt-4 pb-4 w-full overflow-hidden rounded-t-2xl">
@@ -22,7 +32,7 @@ const stories = [
           {/* Logo 1 - Hoyehh Hanuman */}
           <div className="w-48 h-48 flex items-center justify-center mt-4 lg:mt-0">
             <img 
-              src={imageUrl}
+              src={imageUrls.hanuman}
               alt="HOYEHH Hanuman Logo" 
               className="w-full h-full object-contain"
             />
@@ -36,7 +46,7 @@ const stories = [
             {/* Logo 2 - Hoyehh Wordmark */}
             <div className="w-[270px] flex items-center justify-center">
               <img 
-                src={imageUrl}
+                src={imageUrls.wordmark}
                 alt="HOYEHH Wordmark Logo" 
                 className="w-full h-[67px] object-contain"
               />
@@ -178,32 +188,22 @@ const stories = [
 ];
 
 export default function Stories() {
-  const [imageUrl, setImageUrl] = useState<string>('');
+  const [imageUrls, setImageUrls] = useState<ImageUrls>({
+    hanuman: '/api/assets/hoyehh-hanuman.svg',
+    wordmark: '/api/assets/Hoyehh-wordmark.svg'
+  });
 
-  useEffect(() => {
-    const loadImage = async () => {
-      try {
-        const response = await fetch('/api/assets/hoyehh-hanuman.svg');
-        const data = await response.json();
-        setImageUrl(data.url);
-      } catch (error) {
-        console.error('Failed to load image:', error);
-      }
-    };
-
-    loadImage();
-  }, []);
-
-  const renderStories = stories.map(story => ({
+  // Transform stories to render function content
+  const renderedStories = stories.map(story => ({
     ...story,
     content: typeof story.content === 'function' 
-      ? story.content({ imageUrl })
+      ? story.content({ imageUrls })
       : story.content
   }));
 
   return (
     <div className="min-h-screen bg-[#FFEB3B] flex items-center justify-center p-4">
-      <CubeStories stories={renderStories} />
+      <CubeStories stories={renderedStories} />
     </div>
   );
 }
