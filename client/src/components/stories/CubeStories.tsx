@@ -39,25 +39,23 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     container.focus();
   }, []);
 
-  // Initial nudge animation
+  // Initial hint animation
   useEffect(() => {
     if (!hasInteracted) {
-      const animateNudge = async () => {
+      const animateHint = async () => {
+        // Move towards next slide
         await controls.start({
-          rotateY: rotation - 15,
-          transition: { duration: 0.8, ease: "easeInOut" }
+          rotateY: rotation - 45, // Move halfway to next slide
+          transition: { duration: 1, ease: "easeOut" }
         });
-        await controls.start({
-          rotateY: rotation + 15,
-          transition: { duration: 0.8, ease: "easeInOut" }
-        });
+        // Return to original position
         await controls.start({
           rotateY: rotation,
-          transition: { duration: 0.4, ease: "easeOut" }
+          transition: { duration: 0.8, ease: "easeInOut" }
         });
       };
 
-      const intervalId = setInterval(animateNudge, 4000); // Repeat every 4 seconds
+      const intervalId = setInterval(animateHint, 3000); // Repeat every 3 seconds
 
       return () => clearInterval(intervalId);
     }
@@ -66,6 +64,11 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
   const handleInteraction = () => {
     if (!hasInteracted) {
       setHasInteracted(true);
+      // Reset to base rotation when user interacts
+      controls.start({
+        rotateY: rotation,
+        transition: { duration: 0.3, ease: "easeOut" }
+      });
     }
   };
 
