@@ -62,9 +62,13 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
   };
 
   const getSlideOpacity = (index: number) => {
+    // Current slide is fully visible
     if (index === currentIndex) return 1;
+    // Next slide is at 50% opacity
     if (index === currentIndex + 1) return 0.5;
+    // Previous slide is at 50% opacity (except on first slide)
     if (index === currentIndex - 1 && currentIndex > 0) return 0.5;
+    // All other slides are hidden
     return 0;
   };
 
