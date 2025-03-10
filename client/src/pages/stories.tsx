@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react';
 import CubeStories from "@/components/stories/CubeStories";
-import { Client } from '@replit/object-storage';
-
-const client = new Client();
 
 const stories = [
   {
@@ -13,10 +10,6 @@ const stories = [
         <div className="bg-[#EE5524] pt-4 pb-4 w-full overflow-hidden rounded-t-2xl">
           <div className="marquee-container">
             <div className="marquee">
-              <span className="mx-8 text-white font-bold text-lg">&quot;We&apos;re obsessed&quot;</span>
-              <span className="mx-8 text-white font-bold text-lg">&quot;oh its going on stuff&quot;</span>
-              <span className="mx-8 text-white font-bold text-lg">&quot;others are just spicy...but HOYEHH is flavorful&quot;</span>
-              {/* Duplicate for seamless loop */}
               <span className="mx-8 text-white font-bold text-lg">&quot;We&apos;re obsessed&quot;</span>
               <span className="mx-8 text-white font-bold text-lg">&quot;oh its going on stuff&quot;</span>
               <span className="mx-8 text-white font-bold text-lg">&quot;others are just spicy...but HOYEHH is flavorful&quot;</span>
@@ -190,8 +183,9 @@ export default function Stories() {
   useEffect(() => {
     const loadImage = async () => {
       try {
-        const url = await client.getSignedUrl('GET', 'hoyehh-hanuman.svg', 60 * 60);
-        setImageUrl(url);
+        const response = await fetch('/api/assets/hoyehh-hanuman.svg');
+        const data = await response.json();
+        setImageUrl(data.url);
       } catch (error) {
         console.error('Failed to load image:', error);
       }
