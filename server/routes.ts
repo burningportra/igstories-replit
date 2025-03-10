@@ -4,17 +4,22 @@ import { storage } from "./storage";
 import { Client } from '@replit/object-storage';
 
 const objectStorage = new Client({
-  bucketId: 'replit-objstore-eb6fbb48-c0e4-4f0a-860c-88783397643d'
+  bucketId: process.env.REPLIT_BUCKET_ID || 'replit-objstore-eb6fbb48-c0e4-4f0a-860c-88783397643d'
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/assets/:key', async (req, res) => {
     try {
-      const signedUrl = await objectStorage.getSignedUrl(
-        'GET',
-        req.params.key,
-        60 * 60 // 1 hour expiry
-      );
+      // Prefix the key with 'images/'
+      const key = `images/${req.params.key}`;
+      console.log(`Generating signed URL for key: ${key}`);
+
+      const signedUrl = await objectStorage.createSignedUrl({
+        key,
+        expiresIn: 60 * 60, // 1 hour expiry
+      });
+
+      console.log(`Successfully generated signed URL for ${key}`);
       res.json({ url: signedUrl });
     } catch (error) {
       console.error('Failed to generate signed URL:', error);
