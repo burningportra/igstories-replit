@@ -80,7 +80,7 @@ export default function useStoryNavigation(totalStories: number) {
       }));
 
       const deltaX = clientX - touchState.startX;
-      const rotationDelta = (deltaX / window.innerWidth) * 90; // Increased sensitivity
+      const rotationDelta = (deltaX / window.innerWidth) * 120; // Increased sensitivity for more responsive feel
       setRotation((prev) => {
         const baseRotation = currentIndex * -90;
         return baseRotation + rotationDelta;
@@ -93,8 +93,8 @@ export default function useStoryNavigation(totalStories: number) {
     if (!isDragging) return;
 
     const deltaX = touchState.currentX - touchState.startX;
-    const threshold = window.innerWidth * 0.2; // Reduced threshold to 20% of screen width
-    const velocityThreshold = 0.5; // Pixels per millisecond
+    const threshold = window.innerWidth * 0.15; // Reduced threshold to 15% of screen width
+    const velocityThreshold = 0.3; // Lower velocity threshold for more responsive flick gestures
 
     // Transition based on either distance or velocity
     if (Math.abs(deltaX) > threshold || Math.abs(touchState.velocity) > velocityThreshold) {

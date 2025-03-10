@@ -92,7 +92,7 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
             className="cube-wrapper absolute w-full h-full transform-style-3d"
             style={{
               transform: `translateZ(-${CUBE_SIZE / 2}px) rotateY(${isDragging ? rotation : rotation + hintRotation}deg)`,
-              transition: isDragging ? undefined : "transform 800ms cubic-bezier(0.4, 0.0, 0.2, 1)",
+              transition: isDragging ? undefined : "transform 300ms cubic-bezier(0.2, 0.0, 0.2, 1)", // Faster, snappier transition
             }}
           >
             {stories.map((story, index) => (
