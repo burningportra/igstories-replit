@@ -1,14 +1,20 @@
+import { useEffect, useState } from 'react';
 import CubeStories from "@/components/stories/CubeStories";
+import { getImageUrl } from '@/lib/storage';
 
 const stories = [
   {
     id: 1,
-    content: (
+    content: ({imageUrls}: {imageUrls: {hanuman: string; wordmark: string}}) => (
       <div className="h-full flex flex-col">
         {/* Marquee section with pull quotes */}
         <div className="bg-[#EE5524] pt-4 pb-4 w-full overflow-hidden rounded-t-2xl">
           <div className="marquee-container">
             <div className="marquee">
+              <span className="mx-8 text-white font-bold text-lg">&quot;We&apos;re obsessed&quot;</span>
+              <span className="mx-8 text-white font-bold text-lg">&quot;oh its going on stuff&quot;</span>
+              <span className="mx-8 text-white font-bold text-lg">&quot;others are just spicy...but HOYEHH is flavorful&quot;</span>
+              {/* Duplicate for seamless loop */}
               <span className="mx-8 text-white font-bold text-lg">&quot;We&apos;re obsessed&quot;</span>
               <span className="mx-8 text-white font-bold text-lg">&quot;oh its going on stuff&quot;</span>
               <span className="mx-8 text-white font-bold text-lg">&quot;others are just spicy...but HOYEHH is flavorful&quot;</span>
@@ -21,7 +27,7 @@ const stories = [
           {/* Logo 1 - Hoyehh Hanuman */}
           <div className="w-48 h-48 flex items-center justify-center mt-4 lg:mt-0">
             <img 
-              src="/images/hoyehh-hanuman.svg" 
+              src={imageUrls.hanuman}
               alt="HOYEHH Hanuman Logo" 
               className="w-full h-full object-contain"
             />
@@ -35,7 +41,7 @@ const stories = [
             {/* Logo 2 - Hoyehh Wordmark */}
             <div className="w-[270px] flex items-center justify-center">
               <img 
-                src="/images/Hoyehh-wordmark.svg" 
+                src={imageUrls.wordmark}
                 alt="HOYEHH Wordmark Logo" 
                 className="w-full h-[67px] object-contain"
               />
@@ -177,9 +183,33 @@ const stories = [
 ];
 
 export default function Stories() {
+  const [imageUrls, setImageUrls] = useState<{hanuman: string; wordmark: string}>({
+    hanuman: '',
+    wordmark: ''
+  });
+
+  useEffect(() => {
+    const loadImages = async () => {
+      const [hanuman, wordmark] = await Promise.all([
+        getImageUrl('hoyehh-hanuman.svg'),
+        getImageUrl('Hoyehh-wordmark.svg')
+      ]);
+      setImageUrls({ hanuman, wordmark });
+    };
+
+    loadImages();
+  }, []);
+
+  const renderStories = stories.map(story => ({
+    ...story,
+    content: typeof story.content === 'function' 
+      ? story.content({ imageUrls })
+      : story.content
+  }));
+
   return (
     <div className="min-h-screen bg-[#FFEB3B] flex items-center justify-center p-4">
-      <CubeStories stories={stories} />
+      <CubeStories stories={renderStories} />
     </div>
   );
 }
