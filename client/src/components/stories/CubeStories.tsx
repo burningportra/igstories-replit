@@ -78,8 +78,8 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
       return 0.5 + ((slideRotation - 270) / 90) * 0.5; // Fade in from 0.5
     }
 
-    // Hide faces that aren't next/previous
-    return 0; // Hide faces that aren't next/previous
+    // Other faces stay at base opacity
+    return 0.5;
   };
 
   const currentRotation = isDragging ? rotation : rotation + hintRotation;
