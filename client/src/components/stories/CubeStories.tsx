@@ -111,7 +111,9 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
           </div>
 
           <button
-            className="absolute left-0 top-0 w-1/3 h-full z-10 opacity-0"
+            className={`absolute left-0 top-0 w-1/3 h-full z-10 opacity-0 ${
+              currentIndex === 0 ? 'hidden' : ''
+            }`}
             onClick={(e) => {
               handleInteraction();
               goToPrevious();
