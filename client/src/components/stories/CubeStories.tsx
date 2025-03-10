@@ -61,21 +61,15 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     }
   };
 
-  const getSlideOpacity = (index: number, totalRotation: number) => {
-    const normalizedRotation = ((totalRotation % 360) + 360) % 360;
-    const slideRotation = (index * 90 + normalizedRotation + 360) % 360;
-
-    // Front face (0°) is fully visible
-    if (slideRotation === 0) return 1;
-
-    // Calculate opacity based on rotation - fade in as it approaches front
-    if (slideRotation <= 90) {
-      return 1 - (slideRotation / 90) * 0.5; // Fade out to 0.5
-    } else if (slideRotation >= 270) {
-      return 0.5 + ((slideRotation - 270) / 90) * 0.5; // Fade in from 0.5
-    }
-
-    return 0.5;
+  const getSlideOpacity = (index: number) => {
+    // Current slide is fully visible
+    if (index === currentIndex) return 1;
+    // Next slide is at 50% opacity
+    if (index === currentIndex + 1) return 0.5;
+    // Previous slide is at 50% opacity (except on first slide)
+    if (index === currentIndex - 1 && currentIndex > 0) return 0.5;
+    // All other slides are hidden
+    return 0;
   };
 
   const currentRotation = isDragging ? rotation : rotation + hintRotation;
@@ -118,7 +112,7 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
                 className="cube-face absolute w-full h-full backface-hidden"
                 style={{
                   transform: `rotateY(${index * 90}deg) translateZ(${CUBE_TRANSLATE_Z}px)`,
-                  opacity: getSlideOpacity(index, -currentRotation),
+                  opacity: getSlideOpacity(index),
                   transition: isDragging ? undefined : "opacity 300ms ease-out",
                   willChange: "transform, opacity",
                 }}
