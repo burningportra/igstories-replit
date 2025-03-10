@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import CubeStories from "@/components/stories/CubeStories";
-import { getImageUrl } from '@/lib/storage';
+import { Client } from '@replit/object-storage';
+
+const client = new Client();
 
 const stories = [
   {
     id: 1,
-    content: ({imageUrls}: {imageUrls: {hanuman: string; wordmark: string}}) => (
+    content: ({imageUrl}: {imageUrl: string}) => (
       <div className="h-full flex flex-col">
         {/* Marquee section with pull quotes */}
         <div className="bg-[#EE5524] pt-4 pb-4 w-full overflow-hidden rounded-t-2xl">
@@ -27,7 +29,7 @@ const stories = [
           {/* Logo 1 - Hoyehh Hanuman */}
           <div className="w-48 h-48 flex items-center justify-center mt-4 lg:mt-0">
             <img 
-              src={imageUrls.hanuman}
+              src={imageUrl}
               alt="HOYEHH Hanuman Logo" 
               className="w-full h-full object-contain"
             />
@@ -41,7 +43,7 @@ const stories = [
             {/* Logo 2 - Hoyehh Wordmark */}
             <div className="w-[270px] flex items-center justify-center">
               <img 
-                src={imageUrls.wordmark}
+                src={imageUrl}
                 alt="HOYEHH Wordmark Logo" 
                 className="w-full h-[67px] object-contain"
               />
@@ -183,27 +185,25 @@ const stories = [
 ];
 
 export default function Stories() {
-  const [imageUrls, setImageUrls] = useState<{hanuman: string; wordmark: string}>({
-    hanuman: '',
-    wordmark: ''
-  });
+  const [imageUrl, setImageUrl] = useState<string>('');
 
   useEffect(() => {
-    const loadImages = async () => {
-      const [hanuman, wordmark] = await Promise.all([
-        getImageUrl('hoyehh-hanuman.svg'),
-        getImageUrl('Hoyehh-wordmark.svg')
-      ]);
-      setImageUrls({ hanuman, wordmark });
+    const loadImage = async () => {
+      try {
+        const url = await client.getSignedUrl('GET', 'hoyehh-hanuman.svg', 60 * 60);
+        setImageUrl(url);
+      } catch (error) {
+        console.error('Failed to load image:', error);
+      }
     };
 
-    loadImages();
+    loadImage();
   }, []);
 
   const renderStories = stories.map(story => ({
     ...story,
     content: typeof story.content === 'function' 
-      ? story.content({ imageUrls })
+      ? story.content({ imageUrl })
       : story.content
   }));
 
