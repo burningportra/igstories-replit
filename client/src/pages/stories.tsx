@@ -1,73 +1,12 @@
-import { useEffect, useState } from 'react';
 import CubeStories from "@/components/stories/CubeStories";
 
-interface ImageUrls {
-  hanuman: string;
-  wordmark: string;
-}
-
-interface Story {
-  id: number;
-  content: React.ReactNode | ((props: { imageUrls: ImageUrls }) => React.ReactNode);
-}
-
-const stories: Story[] = [
+const stories = [
   {
     id: 1,
-    content: ({imageUrls}: {imageUrls: ImageUrls}) => (
-      <div className="h-full flex flex-col">
-        {/* Marquee section with pull quotes */}
-        <div className="bg-[#EE5524] pt-4 pb-4 w-full overflow-hidden rounded-t-2xl">
-          <div className="marquee-container">
-            <div className="marquee">
-              <span className="mx-8 text-white font-bold text-lg">&quot;We&apos;re obsessed&quot;</span>
-              <span className="mx-8 text-white font-bold text-lg">&quot;oh its going on stuff&quot;</span>
-              <span className="mx-8 text-white font-bold text-lg">&quot;others are just spicy...but HOYEHH is flavorful&quot;</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Main content */}
-        <div className="flex-1 flex flex-col items-center justify-start lg:justify-center px-8 py-4 lg:py-8 space-y-4 text-center w-full">
-          {/* Logo 1 - Hoyehh Hanuman */}
-          <div className="w-48 h-48 flex items-center justify-center mt-4 lg:mt-0">
-            <img 
-              src={imageUrls.hanuman}
-              alt="HOYEHH Hanuman Logo" 
-              className="w-full h-full object-contain"
-            />
-          </div>
-
-          {/* Group for text content with responsive spacing */}
-          <div className="flex flex-col space-y-3 lg:space-y-4">
-            {/* Craft Chili Oil text */}
-            <h2 className="text-2xl font-bold text-black">craft chili oil</h2>
-
-            {/* Logo 2 - Hoyehh Wordmark */}
-            <div className="w-[270px] flex items-center justify-center">
-              <img 
-                src={imageUrls.wordmark}
-                alt="HOYEHH Wordmark Logo" 
-                className="w-full h-[67px] object-contain"
-              />
-            </div>
-
-            {/* Latest Batch text */}
-            <h3 className="text-xl font-medium text-black">latest batch</h3>
-
-            {/* Date and stock count */}
-            <p className="text-lg text-black">
-              2/25/25 <span className="text-[#EE5524] font-bold">(4 left)</span>
-            </p>
-          </div>
-
-          {/* Buy Now button */}
-          <button
-            className="mt-4 px-8 py-3 bg-black text-white font-bold rounded-full hover:bg-gray-800 transition-colors"
-          >
-            Buy Now
-          </button>
-        </div>
+    content: (
+      <div className="h-full flex flex-col items-center justify-center space-y-4 bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+        <h1 className="text-4xl font-bold text-center">Welcome to Stories</h1>
+        <p className="text-lg text-center">Swipe to explore more content</p>
       </div>
     ),
   },
@@ -188,22 +127,9 @@ const stories: Story[] = [
 ];
 
 export default function Stories() {
-  const [imageUrls, setImageUrls] = useState<ImageUrls>({
-    hanuman: '/api/assets/hoyehh-hanuman.svg',
-    wordmark: '/api/assets/Hoyehh-wordmark.svg'
-  });
-
-  // Transform stories to render function content
-  const renderedStories = stories.map(story => ({
-    ...story,
-    content: typeof story.content === 'function' 
-      ? story.content({ imageUrls })
-      : story.content
-  }));
-
   return (
     <div className="min-h-screen bg-[#FFEB3B] flex items-center justify-center p-4">
-      <CubeStories stories={renderedStories} />
+      <CubeStories stories={stories} />
     </div>
   );
 }
