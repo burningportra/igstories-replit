@@ -128,7 +128,7 @@ const stories = [
 
 export default function Stories() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#FFEB3B] flex items-center justify-center p-4">
       <CubeStories stories={stories} />
     </div>
   );
