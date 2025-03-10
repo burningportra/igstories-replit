@@ -43,7 +43,7 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     if (!hasInteracted) {
       const animateHint = async () => {
         // Move towards next slide
-        setHintRotation(-35);
+        setHintRotation(-17); // Reduced to show less of the next slide
         // Return to original position after a delay
         setTimeout(() => {
           setHintRotation(0);
