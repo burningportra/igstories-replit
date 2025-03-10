@@ -79,7 +79,7 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     }
 
     // Hidden faces (beyond 90 degrees)
-    return 0.5; // Keep at 50% opacity instead of completely hiding
+    return 0; // Hide faces that aren't next/previous
   };
 
   const currentRotation = isDragging ? rotation : rotation + hintRotation;
