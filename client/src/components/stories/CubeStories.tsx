@@ -78,7 +78,7 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
       return 0.5 + ((slideRotation - 270) / 90) * 0.5; // Fade in from 0.5
     }
 
-    // Hidden faces (beyond 90 degrees)
+    // Hide faces that aren't next/previous
     return 0; // Hide faces that aren't next/previous
   };
 
