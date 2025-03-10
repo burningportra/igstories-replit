@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useAnimation } from "framer-motion";
 import useStoryNavigation from "@/hooks/use-story-navigation";
 import PhoneFrame from "./PhoneFrame";
 import StoryIndicator from "./StoryIndicator";
@@ -17,7 +16,7 @@ const CUBE_SIZE = 375; // Width of the cube face
 
 export default function CubeStories({ stories }: CubeStoriesProps) {
   const [hasInteracted, setHasInteracted] = useState(false);
-  const controls = useAnimation();
+  const [hintRotation, setHintRotation] = useState(0);
 
   const {
     currentIndex,
@@ -44,31 +43,23 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     if (!hasInteracted) {
       const animateHint = async () => {
         // Move towards next slide
-        await controls.start({
-          rotateY: -80, // Increased rotation for more next slide visibility
-          transition: { duration: 0.5, ease: "easeInOut" } // Adjusted duration and easing
-        });
-        // Return to original position
-        await controls.start({
-          rotateY: 0,
-          transition: { duration: 0.3, ease: "easeInOut" } // Adjusted duration and easing
-        });
+        setHintRotation(-80);
+        // Return to original position after a delay
+        setTimeout(() => {
+          setHintRotation(0);
+        }, 500);
       };
 
       const intervalId = setInterval(animateHint, 2000); // Repeat every 2 seconds
 
       return () => clearInterval(intervalId);
     }
-  }, [hasInteracted, controls]);
+  }, [hasInteracted]);
 
   const handleInteraction = () => {
     if (!hasInteracted) {
       setHasInteracted(true);
-      // Reset to base rotation when user interacts
-      controls.start({
-        rotateY: 0,
-        transition: { duration: 0.3, ease: "easeOut" }
-      });
+      setHintRotation(0);
     }
   };
 
@@ -97,18 +88,10 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
           onMouseUp={handleTouchEnd}
           onMouseLeave={handleTouchEnd}
         >
-          {/* Hint animation wrapper */}
-          {!hasInteracted && (
-            <motion.div
-              className="absolute inset-0 pointer-events-none"
-              animate={controls}
-            />
-          )}
-          {/* Main cube wrapper */}
           <div
             className="cube-wrapper absolute w-full h-full transform-style-3d"
             style={{
-              transform: `translateZ(-${CUBE_SIZE / 2}px) rotateY(${rotation}deg)`,
+              transform: `translateZ(-${CUBE_SIZE / 2}px) rotateY(${isDragging ? rotation : rotation + hintRotation}deg)`,
               transition: isDragging ? undefined : "transform 500ms cubic-bezier(0.4, 0.0, 0.2, 1)",
             }}
           >
