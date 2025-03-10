@@ -45,12 +45,12 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
       const animateHint = async () => {
         // Move towards next slide
         await controls.start({
-          rotateY: rotation - 80, // Increased rotation for more next slide visibility
+          rotateY: -80, // Increased rotation for more next slide visibility
           transition: { duration: 0.5, ease: "easeInOut" } // Adjusted duration and easing
         });
         // Return to original position
         await controls.start({
-          rotateY: rotation,
+          rotateY: 0,
           transition: { duration: 0.3, ease: "easeInOut" } // Adjusted duration and easing
         });
       };
@@ -59,14 +59,14 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
 
       return () => clearInterval(intervalId);
     }
-  }, [hasInteracted, rotation, controls]);
+  }, [hasInteracted, controls]);
 
   const handleInteraction = () => {
     if (!hasInteracted) {
       setHasInteracted(true);
       // Reset to base rotation when user interacts
       controls.start({
-        rotateY: rotation,
+        rotateY: 0,
         transition: { duration: 0.3, ease: "easeOut" }
       });
     }
@@ -97,9 +97,16 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
           onMouseUp={handleTouchEnd}
           onMouseLeave={handleTouchEnd}
         >
-          <motion.div
+          {/* Hint animation wrapper */}
+          {!hasInteracted && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              animate={controls}
+            />
+          )}
+          {/* Main cube wrapper */}
+          <div
             className="cube-wrapper absolute w-full h-full transform-style-3d"
-            animate={controls}
             style={{
               transform: `translateZ(-${CUBE_SIZE / 2}px) rotateY(${rotation}deg)`,
               transition: isDragging ? undefined : "transform 500ms cubic-bezier(0.4, 0.0, 0.2, 1)",
@@ -118,7 +125,7 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
                 </div>
               </div>
             ))}
-          </motion.div>
+          </div>
 
           <button
             className="absolute left-0 top-0 w-1/3 h-full z-10 opacity-0"
