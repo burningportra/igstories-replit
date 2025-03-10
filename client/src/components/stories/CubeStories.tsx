@@ -79,7 +79,7 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     }
 
     // Hidden faces
-    return 0.5;
+    return 0;  // Hide non-visible faces completely
   };
 
   const currentRotation = isDragging ? rotation : rotation + hintRotation;
@@ -119,11 +119,12 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
             {stories.map((story, index) => (
               <div
                 key={story.id}
-                className="cube-face absolute w-full h-full backface-hidden bg-white"
+                className="cube-face absolute w-full h-full backface-hidden"
                 style={{
                   transform: `rotateY(${index * 90}deg) translateZ(${CUBE_SIZE / 2}px)`,
                   opacity: getSlideOpacity(index, -currentRotation),
                   transition: isDragging ? undefined : "opacity 300ms ease-out",
+                  willChange: "transform, opacity",
                 }}
               >
                 <div className="w-full h-full">
