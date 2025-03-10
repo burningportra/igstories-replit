@@ -43,11 +43,11 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     if (!hasInteracted) {
       const animateHint = async () => {
         // Move towards next slide
-        setHintRotation(-80);
+        setHintRotation(-70);
         // Return to original position after a delay
         setTimeout(() => {
           setHintRotation(0);
-        }, 500);
+        }, 800);
       };
 
       const intervalId = setInterval(animateHint, 2000); // Repeat every 2 seconds
@@ -92,7 +92,7 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
             className="cube-wrapper absolute w-full h-full transform-style-3d"
             style={{
               transform: `translateZ(-${CUBE_SIZE / 2}px) rotateY(${isDragging ? rotation : rotation + hintRotation}deg)`,
-              transition: isDragging ? undefined : "transform 500ms cubic-bezier(0.4, 0.0, 0.2, 1)",
+              transition: isDragging ? undefined : "transform 800ms cubic-bezier(0.4, 0.0, 0.2, 1)",
             }}
           >
             {stories.map((story, index) => (
