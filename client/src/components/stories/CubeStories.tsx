@@ -45,17 +45,17 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
       const animateHint = async () => {
         // Move towards next slide
         await controls.start({
-          rotateY: rotation - 45, // Move halfway to next slide
-          transition: { duration: 1, ease: "easeOut" }
+          rotateY: rotation - 65, // Show more of the next slide
+          transition: { duration: 0.6, ease: "easeOut" }
         });
         // Return to original position
         await controls.start({
           rotateY: rotation,
-          transition: { duration: 0.8, ease: "easeInOut" }
+          transition: { duration: 0.4, ease: "easeOut" }
         });
       };
 
-      const intervalId = setInterval(animateHint, 3000); // Repeat every 3 seconds
+      const intervalId = setInterval(animateHint, 2000); // Repeat more frequently
 
       return () => clearInterval(intervalId);
     }
