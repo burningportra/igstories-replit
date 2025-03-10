@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useAnimation } from "framer-motion";
 import useStoryNavigation from "@/hooks/use-story-navigation";
 import PhoneFrame from "./PhoneFrame";
 import StoryIndicator from "./StoryIndicator";
@@ -16,6 +16,9 @@ interface CubeStoriesProps {
 const CUBE_SIZE = 375; // Width of the cube face
 
 export default function CubeStories({ stories }: CubeStoriesProps) {
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const controls = useAnimation();
+
   const {
     currentIndex,
     rotation,
@@ -36,6 +39,36 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     container.focus();
   }, []);
 
+  // Initial nudge animation
+  useEffect(() => {
+    if (!hasInteracted) {
+      const animateNudge = async () => {
+        await controls.start({
+          rotateY: rotation - 15,
+          transition: { duration: 0.8, ease: "easeInOut" }
+        });
+        await controls.start({
+          rotateY: rotation + 15,
+          transition: { duration: 0.8, ease: "easeInOut" }
+        });
+        await controls.start({
+          rotateY: rotation,
+          transition: { duration: 0.4, ease: "easeOut" }
+        });
+      };
+
+      const intervalId = setInterval(animateNudge, 4000); // Repeat every 4 seconds
+
+      return () => clearInterval(intervalId);
+    }
+  }, [hasInteracted, rotation, controls]);
+
+  const handleInteraction = () => {
+    if (!hasInteracted) {
+      setHasInteracted(true);
+    }
+  };
+
   return (
     <PhoneFrame>
       <div
@@ -43,19 +76,27 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
         className="w-full h-full relative focus:outline-none"
         tabIndex={0}
         onKeyDown={handleKeyDown}
+        onClick={handleInteraction}
       >
         <div
           className="w-full h-full relative overflow-hidden perspective-1200"
-          onTouchStart={handleTouchStart}
+          onTouchStart={(e) => {
+            handleInteraction();
+            handleTouchStart(e);
+          }}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          onMouseDown={handleTouchStart}
+          onMouseDown={(e) => {
+            handleInteraction();
+            handleTouchStart(e);
+          }}
           onMouseMove={handleTouchMove}
           onMouseUp={handleTouchEnd}
           onMouseLeave={handleTouchEnd}
         >
           <motion.div
             className="cube-wrapper absolute w-full h-full transform-style-3d"
+            animate={controls}
             style={{
               transform: `translateZ(-${CUBE_SIZE / 2}px) rotateY(${rotation}deg)`,
               transition: isDragging ? undefined : "transform 500ms cubic-bezier(0.4, 0.0, 0.2, 1)",
@@ -78,12 +119,18 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
 
           <button
             className="absolute left-0 top-0 w-1/3 h-full z-10 opacity-0"
-            onClick={goToPrevious}
+            onClick={(e) => {
+              handleInteraction();
+              goToPrevious();
+            }}
             aria-label="Previous story"
           />
           <button
             className="absolute right-0 top-0 w-1/3 h-full z-10 opacity-0"
-            onClick={goToNext}
+            onClick={(e) => {
+              handleInteraction();
+              goToNext();
+            }}
             aria-label="Next story"
           />
         </div>
