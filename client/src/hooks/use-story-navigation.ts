@@ -19,7 +19,7 @@ export default function useStoryNavigation(totalStories: number) {
 
   const normalizeIndex = useCallback(
     (index: number) => {
-      if (index < 0) return totalStories - 1;
+      if (index < 0) return 0; // Prevent going below 0
       if (index >= totalStories) return 0;
       return index;
     },
@@ -27,7 +27,7 @@ export default function useStoryNavigation(totalStories: number) {
   );
 
   const updateRotation = useCallback((index: number) => {
-    setRotation(index * -90); // Always rotate by 90 degrees
+    setRotation(index * -90);
   }, []);
 
   const goToNext = useCallback(() => {
@@ -39,12 +39,13 @@ export default function useStoryNavigation(totalStories: number) {
   }, [normalizeIndex, updateRotation]);
 
   const goToPrevious = useCallback(() => {
+    if (currentIndex === 0) return; // Prevent going back on first slide
     setCurrentIndex((prev) => {
       const nextIndex = normalizeIndex(prev - 1);
       updateRotation(nextIndex);
       return nextIndex;
     });
-  }, [normalizeIndex, updateRotation]);
+  }, [currentIndex, normalizeIndex, updateRotation]);
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent | React.MouseEvent) => {
@@ -72,6 +73,12 @@ export default function useStoryNavigation(totalStories: number) {
         "touches" in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
       const deltaTime = Date.now() - (touchState.startTime || Date.now());
       const velocity = deltaTime > 0 ? (clientX - touchState.currentX) / deltaTime : 0;
+      const deltaX = clientX - touchState.startX;
+
+      // Prevent backward swipe on first slide
+      if (currentIndex === 0 && deltaX > 0) {
+        return;
+      }
 
       setTouchState((prev) => ({
         ...prev,
@@ -79,8 +86,7 @@ export default function useStoryNavigation(totalStories: number) {
         velocity: velocity,
       }));
 
-      const deltaX = clientX - touchState.startX;
-      const rotationDelta = (deltaX / window.innerWidth) * 120; // Increased sensitivity for more responsive feel
+      const rotationDelta = (deltaX / window.innerWidth) * 120;
       setRotation((prev) => {
         const baseRotation = currentIndex * -90;
         return baseRotation + rotationDelta;
@@ -93,18 +99,19 @@ export default function useStoryNavigation(totalStories: number) {
     if (!isDragging) return;
 
     const deltaX = touchState.currentX - touchState.startX;
-    const threshold = window.innerWidth * 0.15; // Reduced threshold to 15% of screen width
-    const velocityThreshold = 0.3; // Lower velocity threshold for more responsive flick gestures
+    const threshold = window.innerWidth * 0.15;
+    const velocityThreshold = 0.3;
 
-    // Transition based on either distance or velocity
-    if (Math.abs(deltaX) > threshold || Math.abs(touchState.velocity) > velocityThreshold) {
+    // Only allow forward navigation on first slide
+    if (currentIndex === 0 && deltaX > 0) {
+      updateRotation(currentIndex);
+    } else if (Math.abs(deltaX) > threshold || Math.abs(touchState.velocity) > velocityThreshold) {
       if (deltaX > 0 || touchState.velocity > velocityThreshold) {
         goToPrevious();
       } else {
         goToNext();
       }
     } else {
-      // Snap back to current if neither threshold is met
       updateRotation(currentIndex);
     }
 
@@ -116,14 +123,14 @@ export default function useStoryNavigation(totalStories: number) {
     (e: React.KeyboardEvent) => {
       switch (e.key) {
         case "ArrowLeft":
-          goToPrevious();
+          if (currentIndex !== 0) goToPrevious(); // Only allow if not on first slide
           break;
         case "ArrowRight":
           goToNext();
           break;
       }
     },
-    [goToNext, goToPrevious]
+    [goToNext, goToPrevious, currentIndex]
   );
 
   useEffect(() => {
