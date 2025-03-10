@@ -1,6 +1,8 @@
 import { Client } from '@replit/object-storage';
 
-const storage = new Client();
+const storage = new Client({
+  bucketId: 'replit-objstore-eb6fbb48-c0e4-4f0a-860c-88783397643d'
+});
 
 export async function getImageUrl(key: string) {
   try {
