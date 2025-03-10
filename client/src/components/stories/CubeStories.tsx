@@ -63,6 +63,27 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
     }
   };
 
+  // Calculate opacity based on rotation angle
+  const getSlideOpacity = (index: number, totalRotation: number) => {
+    const normalizedRotation = ((totalRotation % 360) + 360) % 360;
+    const slideRotation = (index * 90 + normalizedRotation + 360) % 360;
+
+    // Front face (0°) is fully visible
+    if (slideRotation === 0) return 1;
+
+    // Calculate opacity based on rotation - fade in as it approaches front
+    if (slideRotation <= 90) {
+      return 1 - (slideRotation / 90) * 0.5; // Fade out to 0.5
+    } else if (slideRotation >= 270) {
+      return 0.5 + ((slideRotation - 270) / 90) * 0.5; // Fade in from 0.5
+    }
+
+    // Hidden faces
+    return 0.5;
+  };
+
+  const currentRotation = isDragging ? rotation : rotation + hintRotation;
+
   return (
     <PhoneFrame>
       <div
@@ -91,8 +112,8 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
           <div
             className="cube-wrapper absolute w-full h-full transform-style-3d"
             style={{
-              transform: `translateZ(-${CUBE_SIZE / 2}px) rotateY(${isDragging ? rotation : rotation + hintRotation}deg)`,
-              transition: isDragging ? undefined : "transform 300ms cubic-bezier(0.2, 0.0, 0.2, 1)", // Faster, snappier transition
+              transform: `translateZ(-${CUBE_SIZE / 2}px) rotateY(${currentRotation}deg)`,
+              transition: isDragging ? undefined : "transform 300ms cubic-bezier(0.2, 0.0, 0.2, 1)",
             }}
           >
             {stories.map((story, index) => (
@@ -101,6 +122,8 @@ export default function CubeStories({ stories }: CubeStoriesProps) {
                 className="cube-face absolute w-full h-full backface-hidden bg-white"
                 style={{
                   transform: `rotateY(${index * 90}deg) translateZ(${CUBE_SIZE / 2}px)`,
+                  opacity: getSlideOpacity(index, -currentRotation),
+                  transition: isDragging ? undefined : "opacity 300ms ease-out",
                 }}
               >
                 <div className="w-full h-full">
