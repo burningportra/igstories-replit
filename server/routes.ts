@@ -19,8 +19,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`Attempting to access key: ${key}`);
 
       // Try to get the object directly
-      const bucket = await objectStorage.bucket();
-      const object = await bucket.get(key);
+      const object = await objectStorage.get(key);
       if (!object) {
         throw new Error(`Object not found: ${key}`);
       }
